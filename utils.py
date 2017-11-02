@@ -10,13 +10,17 @@ transform=transforms.Compose([
 cifar10_classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 
-def load_train_cifar10():
+def load_train_cifar10(batch_size=None):
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=32, shuffle=True, num_workers=2)
+    if batch_size is None:
+        batch_size = len(train_set)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
     return train_loader
 
 
-def load_test_cifar10():
-    test_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(test_set, batch_size=32, shuffle=True, num_workers=2)
+def load_test_cifar10(batch_size=None):
+    test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+    if batch_size is None:
+        batch_size = len(test_set)
+    train_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
     return train_loader
