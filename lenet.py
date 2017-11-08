@@ -64,32 +64,32 @@ if __name__ == '__main__':
                 train_correct,
                 train_total, epoch)
 
-        net.eval()
-        test_loss = 0
-        test_correct = 0
-        test_total = 0
-        for id, (inputs, labels) in enumerate(test_loader):
-            inputs, labels = Variable(inputs, volatile=True), Variable(labels)
-            outputs = net(inputs)
-            loss = criterion(outputs, labels)
+        # net.eval()
+        # test_loss = 0
+        # test_correct = 0
+        # test_total = 0
+        # for id, (inputs, labels) in enumerate(test_loader):
+        #     inputs, labels = Variable(inputs, volatile=True), Variable(labels)
+        #     outputs = net(inputs)
+        #     loss = criterion(outputs, labels)
+        #
+        #     test_loss += loss.data[0]
+        #     _, predicted = torch.max(outputs.data, 1)
+        #     test_total += labels.size(0)
+        #     test_correct += predicted.eq(labels.data).sum()
+        #
+        #     print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
+        #         test_loss / (id + 1),
+        #         100. * test_correct / test_total,
+        #         test_correct,
+        #         test_total, epoch)
 
-            test_loss += loss.data[0]
-            _, predicted = torch.max(outputs.data, 1)
-            test_total += labels.size(0)
-            test_correct += predicted.eq(labels.data).sum()
-
-            print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
-                test_loss / (id + 1),
-                100. * test_correct / test_total,
-                test_correct,
-                test_total, epoch)
-
-        print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
-            epoch,
-            train_loss / train_total,
-            test_loss / test_total,
-            100. * train_correct / train_total,
-            100. * test_correct / test_total
-        )
+        # print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
+        #     epoch,
+        #     train_loss / train_total,
+        #     test_loss / test_total,
+        #     100. * train_correct / train_total,
+        #     100. * test_correct / test_total
+        # )
 
     f.close()
