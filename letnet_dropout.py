@@ -23,6 +23,7 @@ class LeNet(nn.Module):
 		self.fc2_dropout_mask = None
 		self.fc3_dropout_mask = None
 
+	
 	def set_dropout_masks(self, inputs):
 		if self.dropout:
 			self.input_dropout_mask = Variable(torch.bernoulli(torch.Tensor(inputs.size()).fill_(1 - self.dropout)), requires_grad=False)
