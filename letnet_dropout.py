@@ -29,9 +29,6 @@ class LeNet(nn.Module):
 			self.input_dropout_mask = Variable(torch.bernoulli(torch.Tensor(inputs.size()).fill_(1 - self.dropout)), requires_grad=False)
 
 
-
-
-
 	def forward(self, x):
 		'''
 		:param x: (batch_size * 3 * 32 * 32)
@@ -57,6 +54,7 @@ if __name__ == '__main__':
 	dropout = 0.1
 	net = LeNet(conv_feature_1=20, conv_feature_2=50, dropout=dropout)
 	criterion = nn.CrossEntropyLoss()
+	print list(net.parameters())[1]
 	optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.5, weight_decay=0.0005)
 	train_loader = utils.load_train_cifar10(batch_size=batch_size)
 	test_loader  = utils.load_test_cifar10(batch_size=batch_size)

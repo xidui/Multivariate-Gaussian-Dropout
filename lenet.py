@@ -5,34 +5,116 @@ import torch.optim as optim
 import utils
 from torch.autograd import Variable
 
+import transformer
+import dropout
 
-class LeNet(nn.Module):
-    def __init__(self, conv_feature_1=6, conv_feature_2=16, fc1=500, fc2=200):
-        super(LeNet, self).__init__()
-        self.conv1 = nn.Conv2d(3, conv_feature_1, 5)
-        self.conv2 = nn.Conv2d(conv_feature_1, conv_feature_2, 5)
-        self.fc1 = nn.Linear(conv_feature_2*5*5, fc1)
-        self.fc2 = nn.Linear(fc1, fc2)
-        self.fc3 = nn.Linear(fc2, 10)
+conv_feature_1 = 20
+conv_feature_2 = 50
+conv_kernal_size = 5
+fc1 = 500
+fc2 = 200
+fc3 = 10
+
+
+model = {
+	0: {
+        'name': 'Conv2d',
+        'parameters': {
+            'in_channels': 3,
+            'out_channels': conv_feature_1,
+            'kernel_size': conv_kernal_size
+        },
+        'activate': 'ReLU',
+        'dropout': {
+            'type': 'bernoulli',
+            'rate': 0.3
+        }
+    },
+    1: {
+        'name': 'MaxPool2d',
+        'parameters': {
+            'kernel_size': 2
+        },
+        'dropout': None
+    },
+    2: {
+        'name': 'Conv2d',
+        'parameters': {
+            'in_channels': conv_feature_1,
+            'out_channels': conv_feature_2,
+            'kernel_size': conv_kernal_size
+        },
+        'activate': 'ReLU',
+        'dropout': None
+    },
+    3: {
+        'name': 'MaxPool2d',
+        'parameters': {
+            'kernel_size': 2
+        },
+        'dropout': None
+    },
+    4: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': conv_feature_2 * conv_kernal_size * conv_kernal_size,
+            'out_features': fc1
+        },
+        'activate': 'ReLU',
+        'transform': transformer.to_line,
+        'dropout': None
+    },
+    5: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': fc1,
+            'out_features': fc2
+        },
+        'activate': 'ReLU',
+        'dropout': None
+    },
+    6: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': fc2,
+            'out_features': fc3
+        },
+        'dropout': None
+    }
+}
+
+
+def layer_driver(layer, cfg):
+    def driver(input):
+        if cfg.get('transform'):
+            input = cfg['transform'](input)
+        if cfg.get('dropout'):
+            input = getattr(dropout, cfg['dropout']['type'])(input, cfg['dropout']['rate'])
+        input = layer(input)
+        if cfg.get('activate'):
+            input = getattr(nn, cfg['activate'])()(input)
+        return input
+    return driver
+
+
+class Model(nn.Module):
+    def __init__(self, model_config):
+        super(Model, self).__init__()
+        self.model = []
+        for index, cfg in sorted(model_config.items(), key=lambda x:x[0]):
+            layer = getattr(nn, cfg['name'])(**cfg['parameters'])
+            setattr(self, 'layer_{0}'.format(index), layer)
+            self.model.append(layer_driver(layer, cfg))
 
     def forward(self, x):
-        '''
-        :param x: (batch_size * 3 * 32 * 32)
-        '''
-        out = F.relu(self.conv1(x))  # (batch_size * 6 * 28 * 28)
-        out = F.max_pool2d(out, 2)  # (batch_size * 6 * 14 * 14)
-        out = F.relu(self.conv2(out))  # (batch_size * 16 * 10 * 10)
-        out = F.max_pool2d(out, 2)  # (batch_size * 16 * 5 * 5)
-        out = out.view(out.size(0), -1)  # (batch_size * 400)
-        out = F.relu(self.fc1(out))  # (batch_size * 120)
-        out = F.relu(self.fc2(out))  # (batch_size * 84)
-        out = self.fc3(out)  # (batch_size * 10)
-        return out
+        for layer in self.model:
+            x = layer(x)
+        return x
 
 
 if __name__ == '__main__':
     batch_size = 32
-    net = LeNet(conv_feature_1=20, conv_feature_2=50)
+    net = Model(model_config=model)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.5, weight_decay=0.0005)
     train_loader = utils.load_train_cifar10(batch_size=batch_size)
