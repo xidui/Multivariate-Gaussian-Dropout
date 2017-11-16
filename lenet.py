@@ -140,11 +140,11 @@ if __name__ == '__main__':
             train_total += labels.size(0)
             train_correct += predicted.eq(labels.data).sum()
 
-            print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3})'.format(
+            print('Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3})'.format(
                 train_loss / (id + 1),
                 100. * train_correct / train_total,
                 train_correct,
-                train_total, epoch)
+                train_total, epoch))
 
         # net.eval()
         # test_loss = 0
