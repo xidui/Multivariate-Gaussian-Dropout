@@ -25,5 +25,7 @@ def multinomial(input, rate):
     return input * mask
 
 
-def gaussian(input):
-    return input
+def gaussian(input, rate):
+    mask = Variable(torch.normal(torch.Tensor(input.size()).fill_(1 - rate), std=0.1), requires_grad=True)
+    return input * mask
+

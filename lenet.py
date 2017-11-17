@@ -26,7 +26,7 @@ model = {
         },
         'activate': 'ReLU',
         'dropout': {
-            'type': 'bernoulli',
+            'type': 'gaussian',
             'rate': 0.3
         }
     },
@@ -173,11 +173,11 @@ if __name__ == '__main__':
             test_total += labels.size(0)
             test_correct += predicted.eq(labels.data).sum()
 
-            print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
+            print('Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
                 test_loss / (id + 1),
                 100. * test_correct / test_total,
                 test_correct,
-                test_total, epoch)
+                test_total, epoch))
 
         print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
             epoch,
