@@ -26,7 +26,7 @@ model = {
         },
         'activate': 'ReLU',
         'dropout': {
-            'type': 'bernoulli',
+            'type': 'multinomial',
             'rate': 0.3
         }
     },
