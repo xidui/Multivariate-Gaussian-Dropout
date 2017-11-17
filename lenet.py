@@ -27,7 +27,7 @@ model = {
         'activate': 'ReLU',
         'dropout': {
             'type': 'gaussian',
-            'rate': 0.3
+            'rate': 0.1
         }
     },
     1: {
@@ -80,11 +80,7 @@ model = {
             'out_features': fc3
         },
         'dropout': None
-    },
-    # 7: {
-    #     'name': 'Softmax',
-    #     'parameters': {},
-    # }
+    }
 }
 
 
@@ -124,12 +120,18 @@ if __name__ == '__main__':
     train_loader = utils.load_train_cifar10(batch_size=batch_size)
     test_loader  = utils.load_test_cifar10(batch_size=batch_size)
 
-    name = 'layer:{0}|conv_1:{1}|conv_2:{2}|fc1:{3}|fc2:{4}|.txt'.format(
+
+    dropout_1 = model[0]['dropout']
+    dropout_2 = 1
+
+    name = 'layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}|fc2:{4}|.txt'.format(
         len(model),
         conv_feature_1,
         conv_feature_2,
         fc1,
-        fc2
+        fc2,
+        str(model[0]['dropout']),
+        str(model[2]['dropout'])
     )
 
 

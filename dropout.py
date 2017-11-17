@@ -19,13 +19,21 @@ def multinomial(input, rate):
     for i in range(input_reshape.size()[0]):
         out = torch.multinomial(prob, input_reshape.size()[0], replacement=True)
         for j in range(out.size()[0]):
-            mask[i, out[j]] += 1
+            mask[i, out[j]] += 1.0
     mask = Variable(torch.Tensor(mask/(input_reshape.size()[1]*(1-rate))/probs_multi), requires_grad=True)
     mask = mask.view(input.size())
+
+
+    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    mask[mask==0] = 1.0
+
     return input * mask
 
 
 def gaussian(input, rate):
     mask = Variable(torch.normal(torch.Tensor(input.size()).fill_(1 - rate), std=0.1), requires_grad=True)
+
+    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    mask[mask == 0] = 1.0
     return input * mask
 
