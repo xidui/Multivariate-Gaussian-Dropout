@@ -8,11 +8,11 @@ from torch.autograd import Variable
 import transformer
 import dropout
 
-conv_feature_1 = 20
-conv_feature_2 = 50
+conv_feature_1 = 30
+conv_feature_2 = 80
 conv_kernal_size = 5
-fc1 = 500
-fc2 = 200
+fc1 = 800
+fc2 = 300
 fc3 = 10
 
 
@@ -80,6 +80,10 @@ model = {
             'out_features': fc3
         },
         'dropout': None
+    },
+    7: {
+        'name': 'Softmax',
+        'parameters': {},
     }
 }
 
@@ -120,9 +124,18 @@ if __name__ == '__main__':
     train_loader = utils.load_train_cifar10(batch_size=batch_size)
     test_loader  = utils.load_test_cifar10(batch_size=batch_size)
 
-    f = open('output.txt', 'w')
+    name = 'layer:{0}|conv_1:{1}|conv_2:{2}|fc1:{3}|fc2:{4}|.txt'.format(
+        len(model),
+        conv_feature_1,
+        conv_feature_2,
+        fc1,
+        fc2
+    )
 
-    for epoch in range(500):
+
+    for epoch in range(100):
+        f = open('result/{0}'.format(name), 'a')
+
         net.train()
         train_loss = 0
         train_correct = 0
@@ -146,32 +159,32 @@ if __name__ == '__main__':
                 train_correct,
                 train_total, epoch))
 
-        # net.eval()
-        # test_loss = 0
-        # test_correct = 0
-        # test_total = 0
-        # for id, (inputs, labels) in enumerate(test_loader):
-        #     inputs, labels = Variable(inputs, volatile=True), Variable(labels)
-        #     outputs = net(inputs)
-        #     loss = criterion(outputs, labels)
-        #
-        #     test_loss += loss.data[0]
-        #     _, predicted = torch.max(outputs.data, 1)
-        #     test_total += labels.size(0)
-        #     test_correct += predicted.eq(labels.data).sum()
-        #
-        #     print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
-        #         test_loss / (id + 1),
-        #         100. * test_correct / test_total,
-        #         test_correct,
-        #         test_total, epoch)
+        net.eval()
+        test_loss = 0
+        test_correct = 0
+        test_total = 0
+        for id, (inputs, labels) in enumerate(test_loader):
+            inputs, labels = Variable(inputs, volatile=True), Variable(labels)
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
 
-        # print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
-        #     epoch,
-        #     train_loss / train_total,
-        #     test_loss / test_total,
-        #     100. * train_correct / train_total,
-        #     100. * test_correct / test_total
-        # )
+            test_loss += loss.data[0]
+            _, predicted = torch.max(outputs.data, 1)
+            test_total += labels.size(0)
+            test_correct += predicted.eq(labels.data).sum()
 
-    f.close()
+            print 'Epoch: {4} | Loss: {0} | Acc: {1} ({2}/{3}) | test'.format(
+                test_loss / (id + 1),
+                100. * test_correct / test_total,
+                test_correct,
+                test_total, epoch)
+
+        print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
+            epoch,
+            train_loss / train_total,
+            test_loss / test_total,
+            100. * train_correct / train_total,
+            100. * test_correct / test_total
+        )
+
+        f.close()
