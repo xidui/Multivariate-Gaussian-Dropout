@@ -8,11 +8,11 @@ from torch.autograd import Variable
 import transformer
 import dropout
 
-conv_feature_1 = 30
-conv_feature_2 = 80
+conv_feature_1 = 20
+conv_feature_2 = 50
 conv_kernal_size = 5
-fc1 = 800
-fc2 = 300
+fc1 = 500
+fc2 = 200
 fc3 = 10
 
 
@@ -26,7 +26,7 @@ model = {
         },
         'activate': 'ReLU',
         'dropout': {
-            'type': 'multinomial',
+            'type': 'bernoulli',
             'rate': 0.3
         }
     },
@@ -81,10 +81,10 @@ model = {
         },
         'dropout': None
     },
-    7: {
-        'name': 'Softmax',
-        'parameters': {},
-    }
+    # 7: {
+    #     'name': 'Softmax',
+    #     'parameters': {},
+    # }
 }
 
 
