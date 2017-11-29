@@ -10,30 +10,43 @@ def bernoulli(input, rate):
 
 def multinomial(input, rate):
     input_reshape = input.view(input.size()[0], -1)
-    prob_multi = (1 + np.random.uniform(low=-0.1, high=0.1, size=input_reshape.size()[1])) / input_reshape.size()[0]
-    probs_multi = np.tile(prob_multi, (input_reshape.size()[0], 1))
-    prob = torch.Tensor(prob_multi)
+    prob_multi = torch.sqrt(torch.mean(input_reshape ** 2, 0, True))
+    norconst = torch.sum(prob_multi)
+    prob_multi = prob_multi / norconst
+    probs_multi = np.tile(prob_multi.data.numpy(), (input_reshape.size()[0], 1))
     # epsilon
-    mask = np.zeros(input_reshape.size())
+    mask = np.zeros(input_reshape.size()[1])
     # draw samples according to multinomial distribution
-    for i in range(input_reshape.size()[0]):
-        out = torch.multinomial(prob, input_reshape.size()[0], replacement=True)
-        for j in range(out.size()[0]):
-            mask[i, out[j]] += 1.0
+    out = torch.multinomial(prob_multi, input_reshape.size()[1], replacement=True)
+    out = out.data.numpy()
+    for j in range(len(out[0])):
+        mask[out[0][j]] += 1.0
+    mask = np.tile(mask, (input_reshape.size()[0], 1))
     mask = Variable(torch.Tensor(mask/(input_reshape.size()[1]*(1-rate))/probs_multi), requires_grad=True)
     mask = mask.view(input.size())
 
-
-    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
-    mask[mask==0] = 1.0
+    # mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    # mask[mask==0] = 1.0
 
     return input * mask
 
 
 def gaussian(input, rate):
-    mask = Variable(torch.normal(torch.Tensor(input.size()).fill_(1 - rate), std=0.1), requires_grad=True)
+    input_reshape = input.view(input.size()[0], -1)
+    stdev = torch.std(input_reshape, 0, True).data.numpy()
+    # each variable is kept with probability of stored in probs
+    probs = np.zeros(input_reshape.size()[1])
+    for j in range(len(probs)):
+        probs[j] = np.random.normal(loc=1-rate, scale=stdev[0][j], size=1)
+        if probs[j] > 1.0:
+            probs[j] = 1.0
+        if probs[j] < 0.0:
+            probs[j] = 0.0
+    probs = np.tile(probs, (input_reshape.size()[0], 1))
+    mask = Variable(torch.bernoulli(torch.Tensor(probs)), requires_grad=True)
+    mask = mask.view(input.size())
 
-    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
-    mask[mask == 0] = 1.0
+    # mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    # mask[mask == 0] = 1.0
     return input * mask
 
