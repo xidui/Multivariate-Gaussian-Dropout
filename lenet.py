@@ -15,18 +15,26 @@ fc1 = 500
 fc2 = 200
 fc3 = 10
 
+dataset = 'MNIST'
+# dataset = 'CIFAR10'
+
+picture_size = 32
+if dataset == 'MNIST':
+    picture_size = 28
+
+
 
 model = {
 	0: {
         'name': 'Conv2d',
         'parameters': {
-            'in_channels': 3,
+            'in_channels': 3 if dataset == 'CIFAR10' else 1,
             'out_channels': conv_feature_1,
             'kernel_size': conv_kernal_size
         },
         'activate': 'ReLU',
         'dropout': {
-            'type': 'gaussian',
+            'type': 'bernoulli',
             'rate': 0.1
         }
     },
@@ -57,7 +65,7 @@ model = {
     4: {
         'name': 'Linear',
         'parameters': {
-            'in_features': conv_feature_2 * conv_kernal_size * conv_kernal_size,
+            'in_features': conv_feature_2 * (((picture_size - 4) / 2 - 4) / 2) ** 2,
             'out_features': fc1
         },
         'activate': 'ReLU',
@@ -117,23 +125,29 @@ if __name__ == '__main__':
     net = Model(model_config=model)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.5, weight_decay=0.0005)
-    train_loader = utils.load_train_cifar10(batch_size=batch_size)
-    test_loader  = utils.load_test_cifar10(batch_size=batch_size)
-
+    train_loader, test_loader = None, None
+    if dataset == 'CIFAR10':
+        train_loader = utils.load_train_cifar10(batch_size=batch_size)
+        test_loader  = utils.load_test_cifar10(batch_size=batch_size)
+    if dataset == 'MNIST':
+        train_loader = utils.load_train_mnist(batch_size=batch_size)
+        test_loader = utils.load_test_mnist(batch_size=batch_size)
 
     dropout_1 = model[0]['dropout']
     dropout_2 = 1
 
-    name = 'layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}|fc2:{4}|.txt'.format(
+    name = '{9}|layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}:{7}|fc2:{4}:{8}|.txt'.format(
         len(model),
         conv_feature_1,
         conv_feature_2,
         fc1,
         fc2,
         str(model[0]['dropout']),
-        str(model[2]['dropout'])
+        str(model[2]['dropout']),
+        str(model[4]['dropout']),
+        str(model[5]['dropout']),
+        dataset
     )
-
 
     for epoch in range(100):
         f = open('result/{0}'.format(name), 'a')
