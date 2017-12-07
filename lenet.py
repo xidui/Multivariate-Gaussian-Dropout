@@ -26,7 +26,7 @@ model = {
         },
         'activate': 'ReLU',
         'dropout': {
-            'type': 'gaussian',
+            'type': 'multivariant',
             'rate': 0.1
         }
     },
@@ -181,12 +181,12 @@ if __name__ == '__main__':
                 test_correct,
                 test_total, epoch))
 
-        print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
-            epoch,
-            train_loss / train_total,
-            test_loss / test_total,
-            100. * train_correct / train_total,
-            100. * test_correct / test_total
-        )
+        # print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
+        #     epoch,
+        #     train_loss / train_total,
+        #     test_loss / test_total,
+        #     100. * train_correct / train_total,
+        #     100. * test_correct / test_total
+        # )
 
         f.close()
