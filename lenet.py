@@ -1,3 +1,4 @@
+from __future__ import print_function
 import torch
 import copy
 import torch.nn as nn
@@ -66,7 +67,7 @@ model = {
     4: {
         'name': 'Linear',
         'parameters': {
-            'in_features': conv_feature_2 * (((picture_size - 4) / 2 - 4) / 2) ** 2,
+            'in_features': conv_feature_2 * (((picture_size - 4) // 2 - 4) // 2) ** 2,
             'out_features': fc1
         },
         'activate': 'ReLU',
@@ -205,23 +206,23 @@ def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='gaussian'):
                 test_correct,
                 test_total, epoch))
 
-        print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
+        print('Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
             epoch,
             train_loss / train_total,
             test_loss / test_total,
             100. * train_correct / train_total,
             100. * test_correct / test_total
-        )
+        ), file=f)
 
         f.close()
 
 
 if __name__ == '__main__':
-    run(apply_layer='conv', rate=0.1, type='multivariant')
-    run(apply_layer='conv', rate=0.3, type='multivariant')
-    run(apply_layer='conv', rate=0.3, type='multivariant2')
-    run(apply_layer='conv', rate=0.5, type='multivariant')
-    run(apply_layer='fc', rate=0.1, type='multivariant')
-    run(apply_layer='fc', rate=0.3, type='multivariant')
-    run(apply_layer='fc', rate=0.3, type='multivariant2')
-    run(apply_layer='fc', rate=0.5, type='multivariant')
+    run(apply_layer='conv', rate=0.1, type='gaussian')
+    run(apply_layer='conv', rate=0.3, type='gaussian')
+    run(apply_layer='conv', rate=0.3, type='gaussian2')
+    run(apply_layer='conv', rate=0.5, type='gaussian')
+    run(apply_layer='fc', rate=0.1, type='gaussian')
+    run(apply_layer='fc', rate=0.3, type='gaussian')
+    run(apply_layer='fc', rate=0.3, type='gaussian2')
+    run(apply_layer='fc', rate=0.5, type='gaussian')
