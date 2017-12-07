@@ -83,14 +83,16 @@ def _multivariant_pre(input, rate):
     out = out.data.numpy()
     for j in range(len(out[0])):
         means[out[0][j]] += 1.0
-
+    means = np.tile(means, (input_reshape.size()[0], 1))
+    means = means / (input_reshape.size()[1] * (1 - rate)) / probs_multi
+   
     # calculate the data-dependent variance for the dropout probabilities
     stdev = torch.std(input_reshape, 0, True).data.numpy()
 
     # each variable is kept with probability of stored in probs
     probs = np.zeros(input_reshape.size()[1])
     for j in range(len(probs)):
-        probs[j] = np.random.normal(loc=means[j], scale=stdev[0][j], size=1)
+        probs[j] = np.random.normal(loc=means[0][j], scale=stdev[0][j], size=1)
         if probs[j] > 1.0:
             probs[j] = 1.0
         if probs[j] < 0.0:

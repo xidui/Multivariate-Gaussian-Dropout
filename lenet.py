@@ -122,7 +122,7 @@ class Model(nn.Module):
         return x
 
 
-def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='gaussian'):
+def run(dataset='CIFAR10', apply_layer='fc', rate=0.1, type='multinomial'):
     _model, _param = get_model_config(dataset)
     _model = copy.deepcopy(_model)
     _dropout = {
