@@ -9,11 +9,12 @@ def bernoulli(input, rate):
 
 
 def _multinomial_pre(input, rate):
-    input_reshape = input.view(input.size()[0], -1)
+    input_reshape = torch.add(input.view(input.size()[0], -1), 1e-10)
     prob_multi = torch.sqrt(torch.mean(input_reshape ** 2, 0, True))
     norconst = torch.sum(prob_multi)
     prob_multi = prob_multi / norconst
     probs_multi = np.tile(prob_multi.data.numpy(), (input_reshape.size()[0], 1))
+    print(input_reshape)
     # epsilon
     mask = np.zeros(input_reshape.size()[1])
     # draw samples according to multinomial distribution
@@ -69,8 +70,8 @@ def gaussian2(input, rate):
 
 
 def _multivariant_pre(input, rate):
-    input_reshape = input.view(input.size()[0], -1)
-
+    input_reshape = torch.add(input.view(input.size()[0], -1), 1e-10)
+    
     # calculate the data-dependent mean for the dropout probabilities
     prob_multi = torch.sqrt(torch.mean(input_reshape ** 2, 0, True))
     norconst = torch.sum(prob_multi)

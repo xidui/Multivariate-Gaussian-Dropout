@@ -122,7 +122,7 @@ class Model(nn.Module):
         return x
 
 
-def run(dataset='CIFAR10', apply_layer='fc', rate=0.1, type='multinomial'):
+def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='multinomial'):
     _model, _param = get_model_config(dataset)
     _model = copy.deepcopy(_model)
     _dropout = {
@@ -228,9 +228,12 @@ if __name__ == '__main__':
     # run(dataset='MNIST', apply_layer='fc', rate=0.3, type='gaussian2')
     # run(dataset='MNIST', apply_layer='fc', rate=0.5, type='gaussian')
 
-    run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
-    run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
-    run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
-    run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
-    run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
-    run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
+    # run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
+
+    run(dataset='CIFAR10', apply_layer='fc', rate=0.1, type='multinomial')
+    
