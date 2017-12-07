@@ -1,4 +1,5 @@
 import torch
+import copy
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -15,13 +16,16 @@ fc1 = 500
 fc2 = 200
 fc3 = 10
 
-dataset = 'MNIST'
-# dataset = 'CIFAR10'
+# dataset = 'MNIST'
+dataset = 'CIFAR10'
 
 picture_size = 32
 if dataset == 'MNIST':
     picture_size = 28
-
+    conv_feature_1 = 6
+    conv_feature_2 = 20
+    fc1 = 50
+    fc2 = 20
 
 
 model = {
@@ -33,10 +37,7 @@ model = {
             'kernel_size': conv_kernal_size
         },
         'activate': 'ReLU',
-        'dropout': {
-            'type': 'bernoulli',
-            'rate': 0.1
-        }
+        'dropout': None
     },
     1: {
         'name': 'MaxPool2d',
@@ -120,36 +121,45 @@ class Model(nn.Module):
         return x
 
 
-if __name__ == '__main__':
+def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='gaussian'):
+    _model = copy.deepcopy(model)
+    _dropout = {
+        'type': type,
+        'rate': rate
+    }
+    if apply_layer == 'conv':
+        _model[0]['dropout'] = _dropout
+        _model[2]['dropout'] = _dropout
+    elif apply_layer == 'fc':
+        _model[4]['dropout'] = _dropout
+        _model[5]['dropout'] = _dropout
+
     batch_size = 32
-    net = Model(model_config=model)
+    net = Model(model_config=_model)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.5, weight_decay=0.0005)
     train_loader, test_loader = None, None
     if dataset == 'CIFAR10':
         train_loader = utils.load_train_cifar10(batch_size=batch_size)
-        test_loader  = utils.load_test_cifar10(batch_size=batch_size)
+        test_loader = utils.load_test_cifar10(batch_size=batch_size)
     if dataset == 'MNIST':
         train_loader = utils.load_train_mnist(batch_size=batch_size)
         test_loader = utils.load_test_mnist(batch_size=batch_size)
 
-    dropout_1 = model[0]['dropout']
-    dropout_2 = 1
-
-    name = '{9}|layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}:{7}|fc2:{4}:{8}|.txt'.format(
-        len(model),
+    name = 'layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}:{7}|fc2:{4}:{8}|{9}.txt'.format(
+        len(_model),
         conv_feature_1,
         conv_feature_2,
         fc1,
         fc2,
-        str(model[0]['dropout']),
-        str(model[2]['dropout']),
-        str(model[4]['dropout']),
-        str(model[5]['dropout']),
+        str(_model[0]['dropout']),
+        str(_model[2]['dropout']),
+        str(_model[4]['dropout']),
+        str(_model[5]['dropout']),
         dataset
     )
 
-    for epoch in range(100):
+    for epoch in range(50):
         f = open('result/{0}'.format(name), 'a')
 
         net.train()
@@ -195,12 +205,23 @@ if __name__ == '__main__':
                 test_correct,
                 test_total, epoch))
 
-        # print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
-        #     epoch,
-        #     train_loss / train_total,
-        #     test_loss / test_total,
-        #     100. * train_correct / train_total,
-        #     100. * test_correct / test_total
-        # )
+        print >> f, 'Epoch: {0} | Train Loss: {1} | Test Loss: {2} | Train Acc: {3} | Test Acc: {4}'.format(
+            epoch,
+            train_loss / train_total,
+            test_loss / test_total,
+            100. * train_correct / train_total,
+            100. * test_correct / test_total
+        )
 
         f.close()
+
+
+if __name__ == '__main__':
+    run(apply_layer='conv', rate=0.1, type='multivariant')
+    run(apply_layer='conv', rate=0.3, type='multivariant')
+    run(apply_layer='conv', rate=0.3, type='multivariant2')
+    run(apply_layer='conv', rate=0.5, type='multivariant')
+    run(apply_layer='fc', rate=0.1, type='multivariant')
+    run(apply_layer='fc', rate=0.3, type='multivariant')
+    run(apply_layer='fc', rate=0.3, type='multivariant2')
+    run(apply_layer='fc', rate=0.5, type='multivariant')

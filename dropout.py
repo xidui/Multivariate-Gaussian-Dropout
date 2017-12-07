@@ -8,7 +8,7 @@ def bernoulli(input, rate):
     return input * mask
 
 
-def multinomial(input, rate):
+def _multinomial_pre(input, rate):
     input_reshape = input.view(input.size()[0], -1)
     prob_multi = torch.sqrt(torch.mean(input_reshape ** 2, 0, True))
     norconst = torch.sum(prob_multi)
@@ -22,22 +22,30 @@ def multinomial(input, rate):
     for j in range(len(out[0])):
         mask[out[0][j]] += 1.0
     mask = np.tile(mask, (input_reshape.size()[0], 1))
-    mask = Variable(torch.Tensor(mask/(input_reshape.size()[1]*(1-rate))/probs_multi), requires_grad=True)
+    mask = Variable(torch.Tensor(mask / (input_reshape.size()[1] * (1 - rate)) / probs_multi), requires_grad=True)
     mask = mask.view(input.size())
+    return mask
 
-    # mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
-    # mask[mask==0] = 1.0
 
+def multinomial(input, rate):
+    mask = _multinomial_pre(input, rate)
     return input * mask
 
 
-def gaussian(input, rate):
+def multinomial2(input, rate):
+    mask = _multinomial_pre(input, rate)
+    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    mask[mask==0] = 1.0
+    return input * mask
+
+
+def _gaussian_pre(input, rate):
     input_reshape = input.view(input.size()[0], -1)
     stdev = torch.std(input_reshape, 0, True).data.numpy()
     # each variable is kept with probability of stored in probs
     probs = np.zeros(input_reshape.size()[1])
     for j in range(len(probs)):
-        probs[j] = np.random.normal(loc=1-rate, scale=stdev[0][j], size=1)
+        probs[j] = np.random.normal(loc=1 - rate, scale=stdev[0][j], size=1)
         if probs[j] > 1.0:
             probs[j] = 1.0
         if probs[j] < 0.0:
@@ -45,13 +53,22 @@ def gaussian(input, rate):
     probs = np.tile(probs, (input_reshape.size()[0], 1))
     mask = Variable(torch.bernoulli(torch.Tensor(probs)), requires_grad=True)
     mask = mask.view(input.size())
+    return mask
 
-    # mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
-    # mask[mask == 0] = 1.0
+
+def gaussian(input, rate):
+    mask = _gaussian_pre(input, rate)
     return input * mask
 
-# combine the approach of multinomial dropout and gaussian dropout
-def multivariant(input, rate):
+
+def gaussian2(input, rate):
+    mask = _gaussian_pre(input, rate)
+    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    mask[mask == 0] = 1.0
+    return input * mask
+
+
+def _multivariant_pre(input, rate):
     input_reshape = input.view(input.size()[0], -1)
 
     # calculate the data-dependent mean for the dropout probabilities
@@ -81,8 +98,17 @@ def multivariant(input, rate):
     probs = np.tile(probs, (input_reshape.size()[0], 1))
     mask = Variable(torch.bernoulli(torch.Tensor(probs)), requires_grad=True)
     mask = mask.view(input.size())
+    return mask
 
-    # mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
-    # mask[mask == 0] = 1.0
+
+# combine the approach of multinomial dropout and gaussian dropout
+def multivariant(input, rate):
+    mask = _multivariant_pre(input, rate)
     return input * mask
 
+
+def multivariant2(input, rate):
+    mask = _multivariant_pre(input, rate)
+    mask = mask * Variable(torch.bernoulli(torch.Tensor(input.size()).fill_(rate)), requires_grad=True)
+    mask[mask == 0] = 1.0
+    return input * mask
