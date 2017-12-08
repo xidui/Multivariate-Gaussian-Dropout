@@ -43,3 +43,8 @@ Epoch: 41 | Train Loss: 0.01497387129187584 | Test Loss: 0.027703355503082276 | 
 Epoch: 42 | Train Loss: 0.014702571357041597 | Test Loss: 0.028437562939524652 | Train Acc: 83.314 | Test Acc: 70.94
 Epoch: 43 | Train Loss: 0.014600409193336964 | Test Loss: 0.02727860700786114 | Train Acc: 83.414 | Test Acc: 71.78
 Epoch: 44 | Train Loss: 0.014465064605176449 | Test Loss: 0.028297454631328583 | Train Acc: 83.542 | Test Acc: 70.32
+Epoch: 45 | Train Loss: 0.014331064206063747 | Test Loss: 0.028263012991845606 | Train Acc: 83.798 | Test Acc: 70.97
+Epoch: 46 | Train Loss: 0.014164416497796773 | Test Loss: 0.028305381152033807 | Train Acc: 84.018 | Test Acc: 70.91
+Epoch: 47 | Train Loss: 0.01408086512207985 | Test Loss: 0.028101541790366173 | Train Acc: 84.016 | Test Acc: 70.91
+Epoch: 48 | Train Loss: 0.013960633363723754 | Test Loss: 0.027936346971988678 | Train Acc: 84.12 | Test Acc: 71.7
+Epoch: 49 | Train Loss: 0.013795805485695601 | Test Loss: 0.02835916009247303 | Train Acc: 84.478 | Test Acc: 71.54
