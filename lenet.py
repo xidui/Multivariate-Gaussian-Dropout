@@ -10,88 +10,88 @@ from torch.autograd import Variable
 import transformer
 import dropout
 
+conv_feature_1 = 20
+conv_feature_2 = 50
+conv_kernal_size = 5
+fc1 = 500
+fc2 = 200
+fc3 = 10
 
-def get_model_config(dataset='CIFAR10'):
-    conv_feature_1 = 20
-    conv_feature_2 = 50
-    conv_kernal_size = 5
-    fc1 = 500
-    fc2 = 200
-    fc3 = 10
+# dataset = 'MNIST'
+dataset = 'CIFAR10'
 
-    picture_size = 32
-    if dataset == 'MNIST':
-        picture_size = 28
-        conv_feature_1 = 6
-        conv_feature_2 = 20
-        fc1 = 50
-        fc2 = 20
+picture_size = 32
+if dataset == 'MNIST':
+    picture_size = 28
+    conv_feature_1 = 6
+    conv_feature_2 = 20
+    fc1 = 50
+    fc2 = 20
 
-    model = {
-        0: {
-            'name': 'Conv2d',
-            'parameters': {
-                'in_channels': 3 if dataset == 'CIFAR10' else 1,
-                'out_channels': conv_feature_1,
-                'kernel_size': conv_kernal_size
-            },
-            'activate': 'ReLU',
-            'dropout': None
+
+model = {
+	0: {
+        'name': 'Conv2d',
+        'parameters': {
+            'in_channels': 3 if dataset == 'CIFAR10' else 1,
+            'out_channels': conv_feature_1,
+            'kernel_size': conv_kernal_size
         },
-        1: {
-            'name': 'MaxPool2d',
-            'parameters': {
-                'kernel_size': 2
-            },
-            'dropout': None
+        'activate': 'ReLU',
+        'dropout': None
+    },
+    1: {
+        'name': 'MaxPool2d',
+        'parameters': {
+            'kernel_size': 2
         },
-        2: {
-            'name': 'Conv2d',
-            'parameters': {
-                'in_channels': conv_feature_1,
-                'out_channels': conv_feature_2,
-                'kernel_size': conv_kernal_size
-            },
-            'activate': 'ReLU',
-            'dropout': None
+        'dropout': None
+    },
+    2: {
+        'name': 'Conv2d',
+        'parameters': {
+            'in_channels': conv_feature_1,
+            'out_channels': conv_feature_2,
+            'kernel_size': conv_kernal_size
         },
-        3: {
-            'name': 'MaxPool2d',
-            'parameters': {
-                'kernel_size': 2
-            },
-            'dropout': None
+        'activate': 'ReLU',
+        'dropout': None
+    },
+    3: {
+        'name': 'MaxPool2d',
+        'parameters': {
+            'kernel_size': 2
         },
-        4: {
-            'name': 'Linear',
-            'parameters': {
-                'in_features': conv_feature_2 * (((picture_size - 4) // 2 - 4) // 2) ** 2,
-                'out_features': fc1
-            },
-            'activate': 'ReLU',
-            'transform': transformer.to_line,
-            'dropout': None
+        'dropout': None
+    },
+    4: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': conv_feature_2 * (((picture_size - 4) // 2 - 4) // 2) ** 2,
+            'out_features': fc1
         },
-        5: {
-            'name': 'Linear',
-            'parameters': {
-                'in_features': fc1,
-                'out_features': fc2
-            },
-            'activate': 'ReLU',
-            'dropout': None
+        'activate': 'ReLU',
+        'transform': transformer.to_line,
+        'dropout': None
+    },
+    5: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': fc1,
+            'out_features': fc2
         },
-        6: {
-            'name': 'Linear',
-            'parameters': {
-                'in_features': fc2,
-                'out_features': fc3
-            },
-            'dropout': None
-        }
+        'activate': 'ReLU',
+        'dropout': None
+    },
+    6: {
+        'name': 'Linear',
+        'parameters': {
+            'in_features': fc2,
+            'out_features': fc3
+        },
+        'dropout': None
     }
-
-    return model, (conv_feature_1, conv_feature_2, fc1, fc2)
+}
 
 
 def layer_driver(layer, cfg):
@@ -122,9 +122,8 @@ class Model(nn.Module):
         return x
 
 
-def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='multinomial'):
-    _model, _param = get_model_config(dataset)
-    _model = copy.deepcopy(_model)
+def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='gaussian'):
+    _model = copy.deepcopy(model)
     _dropout = {
         'type': type,
         'rate': rate
@@ -150,10 +149,10 @@ def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='multinomial'):
 
     name = 'layer:{0}|conv_1:{1}:{5}|conv_2:{2}:{6}|fc1:{3}:{7}|fc2:{4}:{8}|{9}.txt'.format(
         len(_model),
-        _param[0],
-        _param[1],
-        _param[2],
-        _param[3],
+        conv_feature_1,
+        conv_feature_2,
+        fc1,
+        fc2,
         str(_model[0]['dropout']),
         str(_model[2]['dropout']),
         str(_model[4]['dropout']),
@@ -219,21 +218,11 @@ def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='multinomial'):
 
 
 if __name__ == '__main__':
-    # run(dataset='MNIST', apply_layer='conv', rate=0.1, type='gaussian')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='gaussian')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='gaussian2')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.5, type='gaussian')
-    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='gaussian')
-    # run(dataset='MNIST', apply_layer='fc', rate=0.3, type='gaussian')
-    # run(dataset='MNIST', apply_layer='fc', rate=0.3, type='gaussian2')
-    # run(dataset='MNIST', apply_layer='fc', rate=0.5, type='gaussian')
-
-    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
-    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='bernoulli')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.3, type='bernoulli')
-    # run(dataset='MNIST', apply_layer='conv', rate=0.5, type='bernoulli')
-
-    run(dataset='CIFAR10', apply_layer='fc', rate=0.1, type='multinomial')
-    
+    run(apply_layer='conv', rate=0.1, type='gaussian')
+    run(apply_layer='conv', rate=0.3, type='gaussian')
+    run(apply_layer='conv', rate=0.3, type='gaussian2')
+    run(apply_layer='conv', rate=0.5, type='gaussian')
+    run(apply_layer='fc', rate=0.1, type='gaussian')
+    run(apply_layer='fc', rate=0.3, type='gaussian')
+    run(apply_layer='fc', rate=0.3, type='gaussian2')
+    run(apply_layer='fc', rate=0.5, type='gaussian')
