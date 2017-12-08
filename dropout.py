@@ -14,7 +14,6 @@ def _multinomial_pre(input, rate):
     norconst = torch.sum(prob_multi)
     prob_multi = prob_multi / norconst
     probs_multi = np.tile(prob_multi.data.numpy(), (input_reshape.size()[0], 1))
-    print(input_reshape)
     # epsilon
     mask = np.zeros(input_reshape.size()[1])
     # draw samples according to multinomial distribution

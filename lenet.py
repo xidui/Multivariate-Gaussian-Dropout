@@ -218,11 +218,12 @@ def run(dataset='CIFAR10', apply_layer='conv', rate=0.1, type='gaussian'):
 
 
 if __name__ == '__main__':
-    run(apply_layer='conv', rate=0.1, type='gaussian')
-    run(apply_layer='conv', rate=0.3, type='gaussian')
-    run(apply_layer='conv', rate=0.3, type='gaussian2')
-    run(apply_layer='conv', rate=0.5, type='gaussian')
-    run(apply_layer='fc', rate=0.1, type='gaussian')
-    run(apply_layer='fc', rate=0.3, type='gaussian')
-    run(apply_layer='fc', rate=0.3, type='gaussian2')
-    run(apply_layer='fc', rate=0.5, type='gaussian')
+    run(dataset='MNIST', apply_layer='conv', rate=0.1, type='multinomial')
+    run(dataset='MNIST', apply_layer='conv', rate=0.3, type='multinomial')
+    run(dataset='MNIST', apply_layer='conv', rate=0.3, type='multinomial2')
+    run(dataset='MNIST', apply_layer='conv', rate=0.5, type='multinomial')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.1, type='multinomial')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.3, type='multinomial')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.3, type='multinomial2')
+    # run(dataset='MNIST', apply_layer='fc', rate=0.5, type='multinomial')
+    pass
