@@ -1,6 +1,6 @@
 # Multivariate Gaussian Dropout
 
-Project for 10-707 Deep Learning @ Carnegie Mellon University.
+Project for 10-707: Deep Learning @ Carnegie Mellon University.
 
 Proposed and implemented a new dropout method which generates the mask by sampling from a mutlivariate Gaussian distribution, whose parameters are estimated from statistics calculated over a mini-batch of training data.
 
