@@ -1,5 +1,0 @@
-Epoch: 0 | Train Loss: 0.0609707402253 | Test Loss: 0.0512896371007 | Train Acc: 28.384 | Test Acc: 40.42
-Epoch: 1 | Train Loss: 0.0470067116511 | Test Loss: 0.0441148627758 | Train Acc: 45.228 | Test Acc: 48.95
-Epoch: 2 | Train Loss: 0.0415706638598 | Test Loss: 0.0413355398476 | Train Acc: 52.218 | Test Acc: 52.59
-Epoch: 3 | Train Loss: 0.0375232419431 | Test Loss: 0.0361893646598 | Train Acc: 57.176 | Test Acc: 58.78
-Epoch: 4 | Train Loss: 0.0341762632251 | Test Loss: 0.0339756779313 | Train Acc: 61.434 | Test Acc: 61.58
